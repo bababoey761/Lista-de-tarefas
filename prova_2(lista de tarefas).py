@@ -1,5 +1,5 @@
-
-# Lista de Tarefas com Tkinter(ttkbootstrap) e JSON
+# periodo_1 trabalho de programação
+# Lista de Tarefas com Tkinter(ttkbootstrap) e JSON 
 
 import sys
 import subprocess
