@@ -17,7 +17,7 @@ def instalar(pacote):
 instalar('ttkbootstrap')
 instalar('tkinter')
 instalar('json')
-
+from datetime import date
 from tkinter import Listbox
 import ttkbootstrap as tb
 from ttkbootstrap.constants import *
@@ -69,7 +69,7 @@ def remover_tarefa():
 def atualizar_lista(): 
     lista.delete(0, tb.END) # limpa a lista antes de atualizar
     for t in tarefas:
-        status = "✔️" if t["feito"] else "❌" # Vai aplicar um emoji de "✔️" se a tarefa estiver concluída e "❌" se não estiver
+        status = "☑" if t["feito"] else "☐" # Vai aplicar um emoji de "✔️" se a tarefa estiver concluída e "❌" se não estiver
         lista.insert(tb.END, f"{status} {t['tarefa']}") # insere cada tarefa na lista com seu status
 
         # tb.END é usado para adicionar o item no final da lista, enquanto tb.NEXT adicionaria no próximo item.
@@ -97,9 +97,10 @@ entrada.pack(pady=5)
 entrada.focus() # Isso faz com que a entrada receba o foco automaticamente quando a janela é aberta, permitindo que o usuário comece a digitar 
 #                 imediatamente.
 
-#  os valores pad são usados para definir o espaçamento vertical (pady) e horizontal (padx) entre os widgets.
+#  os valores pad são usados para definir o espaçamento vertical (pady) e horizontal (padx) entre os widgets .
 # e para definir o tamanho da entrada, usamos o parâmetro width, que define a largura em caracteres
 #  e para altura usamos o parâmetro height, que define a altura em linhas.
+
 botoes = tb.Frame(root) # Cria um frame para agrupar os botões
 botoes.pack(pady=5)
 
