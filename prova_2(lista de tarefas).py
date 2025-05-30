@@ -1,4 +1,3 @@
-
 import sys
 import subprocess
 def instalar(pacote):
@@ -11,7 +10,7 @@ def instalar(pacote):
 instalar('ttkbootstrap')
 instalar('tkinter')
 instalar('json')
-
+from datetime import date
 import ttkbootstrap as tb
 from tkinter import Toplevel, Entry, Button, messagebox
 from tkinter.scrolledtext import ScrolledText
@@ -59,7 +58,7 @@ class ListaDeTarefasApp:
         self.campo_entrada.pack(side="left", padx=(0, 10))
         self.campo_entrada.focus()
         self.campo_entrada.bind('<Return>', lambda event: self.adicionar_tarefa())
-
+        
         self.btn_adicionar = tb.Button(entrada_frame, text="Limpar", bootstyle="danger", command=self.limpar_lista)
         self.btn_adicionar.pack(side="left")
 
@@ -78,9 +77,10 @@ class ListaDeTarefasApp:
         frame.pack(fill="x", pady=2, padx=10)
 
         status = "☑" if item["feito"] else "☐"
-        tarefa_label = tb.Label(frame, text=f"{status} {item['tarefa']}", font=("Arial", 12), anchor="w")
+        tarefa_label = tb.Label(frame, text=f"{status}{item['tarefa']}", font=("Arial", 12) , anchor="w")
         tarefa_label.pack(side="left", fill="x", expand=True)
         tarefa_label.bind("<Button-1>", lambda e, i=indice: self.toggle_feito(i))
+
 
         btn_editar = tb.Button(frame, text="✏️", width=2, bootstyle="secondary", command=lambda i=indice: self.editar_tarefa(i))
         btn_editar.pack(side="right", padx=2)
@@ -88,10 +88,14 @@ class ListaDeTarefasApp:
         btn_excluir = tb.Button(frame, text="🗑️", width=2, bootstyle="danger", command=lambda i=indice: self.apagar_tarefa(i))
         btn_excluir.pack(side="right", padx=2)
 
+        data_label = tb.Label(frame, text=item["data"], font = ("Arial", 10), anchor="w")
+        data_label.pack(side="right", padx=8)
     def adicionar_tarefa(self):
+        
         texto = self.campo_entrada.get().strip()
         if texto:
-            self.lista_de_tarefas.append({"tarefa": texto, "feito": False})
+            data = date.today()
+            self.lista_de_tarefas.append({"tarefa": texto, "feito": False, "data": str(data) })
             self.salvar_tarefas()
             self.atualizar_lista()
             self.campo_entrada.delete(0, tb.END)
