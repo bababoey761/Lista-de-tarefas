@@ -1,12 +1,6 @@
-# periodo_1 trabalho de programação
-# Lista de Tarefas com Tkinter(ttkbootstrap) e JSON 
 
 import sys
 import subprocess
-ARQUIVO = "tarefas.json" # Define o nome do arquivo JSON onde as tarefas serão salvas
-tarefas = []     
-
-# Nesse bloco aqui, verificamos se os pacotes necessarios já estão instalado. Se não estiver, ele será instalado usando o pip. 
 def instalar(pacote):
     try:
         __import__(pacote)
@@ -17,109 +11,141 @@ def instalar(pacote):
 instalar('ttkbootstrap')
 instalar('tkinter')
 instalar('json')
-from datetime import date
-from tkinter import Listbox
+
 import ttkbootstrap as tb
-from ttkbootstrap.constants import *
+from tkinter import Toplevel, Entry, Button, messagebox
+from tkinter.scrolledtext import ScrolledText
 import json
 import os
 
-# Lembre-se de que a função OPEN() do tkinter possui 4 modos principais:
-# "r" para leitura, "w" para escrita, "a" para anexar e "x" para criar um novo arquivo.
+ARQUIVO = "tarefas.json"
 
-# vamos começar com as funçoes de carregar e salvar as tarefas.
+class ListaDeTarefasApp:
+    def __init__(self, master):
+        self.master = master
+        self.master.title("Lista de Tarefas")
+        self.master.geometry("520x500")
+        self.master.resizable(False, False)
 
-def carregar_tarefas():
-    if os.path.exists(ARQUIVO): # verifica se o arquivo existe
-        with open(ARQUIVO, "r", encoding="utf-8") as f: # utiliza utf-8 para suportar caracteres especiais e "r" para leitura sendo a abreviação de read
-            return json.load(f) # carrega as tarefas do arquivo JSON
-    return [] 
+        self.lista_de_tarefas = self.carregar_tarefas()
 
-tarefas = carregar_tarefas() 
+        self._criar_widgets()
+        self.atualizar_lista()
 
-def salvar_tarefas():
-    with open(ARQUIVO, "w", encoding="utf-8") as f: # utiliza o "w" para escrita sendo a abreviação de write
-        json.dump(tarefas, f, ensure_ascii=False, indent=2) # salva as tarefas no arquivo JSON
-        # O ensure_ascii=False permite que caracteres especiais sejam salvos corretamente no JSON.
-def adicionar_tarefa():
-    texto = entrada.get().strip() # obtém o texto da entrada e remove espaços em branco no início e no final
-    if texto:
-        tarefas.append({"tarefa": texto, "feito": False}) # adiciona a tarefa com o status "feito" como False
-        salvar_tarefas()
-        atualizar_lista()
-        entrada.delete(0, tb.END) # limpa a entrada após adicionar a tarefa
+    def carregar_tarefas(self):
+        if os.path.exists(ARQUIVO):
+            try:
+                with open(ARQUIVO, "r", encoding="utf-8") as f:
+                    return json.load(f)
+            except (json.JSONDecodeError, IOError):
+                messagebox.showwarning("Aviso", "Erro ao carregar tarefas. O arquivo será recriado.")
+                return []
+        return []
 
-def marcar_concluida():
-    selecionado = lista.curselection() # obtém o índice do item selecionado na lista
-    if selecionado:
-        idx = selecionado[0]  
-        tarefas[idx]["feito"] = not tarefas[idx]["feito"]  # alterna o status "feito" da tarefa selecionado
-        salvar_tarefas()
-        atualizar_lista()
+    def salvar_tarefas(self):
+        try:
+            with open(ARQUIVO, "w", encoding="utf-8") as f:
+                json.dump(self.lista_de_tarefas, f, ensure_ascii=False, indent=2)
+        except IOError:
+            messagebox.showerror("Erro", "Falha ao salvar as tarefas.")
 
-def remover_tarefa():
-    selecionado = lista.curselection()
-    if selecionado:
-        idx = selecionado[0] 
-        tarefas.pop(idx) # remove a tarefa selecionada da lista
-        # pop() remove o item na posição especificada e retorna o valor removido
-        salvar_tarefas()
-        atualizar_lista()
+    def _criar_widgets(self):
+        tb.Label(self.master, text="Minhas Tarefas", font=("Arial", 18, "bold")).pack(pady=10)
 
-def atualizar_lista(): 
-    lista.delete(0, tb.END) # limpa a lista antes de atualizar
-    for t in tarefas:
-        status = "☑" if t["feito"] else "☐" # Vai aplicar um emoji de "✔️" se a tarefa estiver concluída e "❌" se não estiver
-        lista.insert(tb.END, f"{status} {t['tarefa']}") # insere cada tarefa na lista com seu status
+        entrada_frame = tb.Frame(self.master)
+        entrada_frame.pack(pady=5)
 
-        # tb.END é usado para adicionar o item no final da lista, enquanto tb.NEXT adicionaria no próximo item.
+        self.campo_entrada = tb.Entry(entrada_frame, width=40)
+        self.campo_entrada.pack(side="left", padx=(0, 10))
+        self.campo_entrada.focus()
+        self.campo_entrada.bind('<Return>', lambda event: self.adicionar_tarefa())
 
-# Aqui é onde sera trabalhado o HUD com o tkinter e ttkbootstrap
-# ttkbootstrap é uma biblioteca que fornece temas e estilos para tkinter, facilitando a criação de interfaces mais modernas e atraentes.
+        self.btn_adicionar = tb.Button(entrada_frame, text="Limpar", bootstyle="danger", command=self.limpar_lista)
+        self.btn_adicionar.pack(side="left")
 
-# Diferente do tkinter, que usa tk.Tk() para criar a janela principal, o ttkbootstrap usa tb.Window() para criar uma janela com tema.
+        self.container_tarefas = tb.Frame(self.master)
+        self.container_tarefas.pack(pady=10, fill="both", expand=True)
 
-root = tb.Window(themename="superhero") # Cria uma janela com o tema "superhero" do ttkbootstrap
-root.title("Lista de Tarefas")  # Define o título da janela
-root.geometry("400x400") # Define o tamanho da janela
+    def atualizar_lista(self):
+        for widget in self.container_tarefas.winfo_children():
+            widget.destroy()
 
-# Cada tema tem um estilo diferente, o que pode mudar a aparência dos botões, entradas e outros widgets.
-# Você pode escolher o tema que mais gostar, basta alterar o valor de "themename" na linha acima.
-# Acesse o site https://ttkbootstrap.readthedocs.io para ver os temas disponíveis
+        for indice, item in enumerate(self.lista_de_tarefas):
+            self._adicionar_linha(item, indice)
 
-# Diferente do tkinter, que usa a abreviação "tk" para importar os módulos, o ttkbootstrap usa a abreviação "tb" para facilitar a leitura do código.
+    def _adicionar_linha(self, item, indice):
+        frame = tb.Frame(self.container_tarefas)
+        frame.pack(fill="x", pady=2, padx=10)
 
-# Aqui vamos criar os widgets (itens da interface) e organizá-los na janela.
-tb.Label(root, text="Lista de tarefas", font=("Arial", 16, "bold")).pack(pady=10)
+        status = "☑" if item["feito"] else "☐"
+        tarefa_label = tb.Label(frame, text=f"{status} {item['tarefa']}", font=("Arial", 12), anchor="w")
+        tarefa_label.pack(side="left", fill="x", expand=True)
+        tarefa_label.bind("<Button-1>", lambda e, i=indice: self.toggle_feito(i))
 
-entrada = tb.Entry(root, width=30) # Cria uma entrada de texto para digitar as tarefas
-entrada.pack(pady=5) 
-entrada.focus() # Isso faz com que a entrada receba o foco automaticamente quando a janela é aberta, permitindo que o usuário comece a digitar 
-#                 imediatamente.
+        btn_editar = tb.Button(frame, text="✏️", width=2, bootstyle="secondary", command=lambda i=indice: self.editar_tarefa(i))
+        btn_editar.pack(side="right", padx=2)
 
-#  os valores pad são usados para definir o espaçamento vertical (pady) e horizontal (padx) entre os widgets .
-# e para definir o tamanho da entrada, usamos o parâmetro width, que define a largura em caracteres
-#  e para altura usamos o parâmetro height, que define a altura em linhas.
+        btn_excluir = tb.Button(frame, text="🗑️", width=2, bootstyle="danger", command=lambda i=indice: self.apagar_tarefa(i))
+        btn_excluir.pack(side="right", padx=2)
 
-botoes = tb.Frame(root) # Cria um frame para agrupar os botões
-botoes.pack(pady=5)
+    def adicionar_tarefa(self):
+        texto = self.campo_entrada.get().strip()
+        if texto:
+            self.lista_de_tarefas.append({"tarefa": texto, "feito": False})
+            self.salvar_tarefas()
+            self.atualizar_lista()
+            self.campo_entrada.delete(0, tb.END)
+        else:
+            messagebox.showinfo("Atenção", "Digite algo para adicionar.")
 
-tb.Button(botoes, text="Adicionar", bootstyle=SUCCESS, command=adicionar_tarefa).pack(side="left", padx=5)
-tb.Button(botoes, text="Concluir", bootstyle=INFO, command=marcar_concluida).pack(side="left", padx=5)
-tb.Button(botoes, text="Remover", bootstyle=DANGER, command=remover_tarefa).pack(side="left", padx=5)
+    def toggle_feito(self, indice):
+        self.lista_de_tarefas[indice]["feito"] = not self.lista_de_tarefas[indice]["feito"]
+        self.salvar_tarefas()
+        self.atualizar_lista()
 
-# Esses termos (SUCESS, INFO, DANGER) correspondem aos estilos de botão do ttkbootstrap ao se aplicar o bootstyle.
-# Eles são usados para definir a aparência do botão, como cor e estilo.
-# Sendo SUCESS (verde), INFO (azul), DANGER (vermelho)
-# Além desses, existem outros estilos como WARNING (amarelo), PRIMARY (azul claro), SECONDARY (cinza), LIGHT (branco) e DARK (preto).
-# Lembre-se que essas cores apenas de aplicam ao tema "superhero" do ttkbootstrap, se você usar outro tema, as cores podem ser diferentes.
+    def editar_tarefa(self, indice):
+        texto_atual = self.lista_de_tarefas[indice]["tarefa"]
 
+        janela_editar = Toplevel(self.master)
+        janela_editar.title("Editar Tarefa")
+        janela_editar.geometry("340x130")
+        janela_editar.resizable(False, False)
 
-lista = Listbox(root, width=40, height=12, font=("Arial", 12)) # listbox é um comando do **tkinter** que permite exibir uma lista de itens
-lista.pack(pady=10) # o método pack() é usado para organizar os itens na janela que fica logo abaixo dos botões
+        entrada_editar = Entry(janela_editar, width=40)
+        entrada_editar.insert(0, texto_atual)
+        entrada_editar.pack(pady=20)
+        entrada_editar.focus()
 
+        def salvar():
+            novo_texto = entrada_editar.get().strip()
+            if novo_texto:
+                self.lista_de_tarefas[indice]["tarefa"] = novo_texto
+                self.salvar_tarefas()
+                self.atualizar_lista()
+                if janela_editar.winfo_exists():
+                    janela_editar.destroy()
+            else:
+                messagebox.showwarning("Aviso", "O texto não pode ficar vazio.")
 
+        Button(janela_editar, text="salvar", command=salvar).pack()
+        
+    def apagar_tarefa(self, indice):
+        resposta = messagebox.askyesno("Confirmar", "Deseja apagar essa tarefa?")
+        if resposta:
+            self.lista_de_tarefas.pop(indice)
+            self.salvar_tarefas()
+            self.atualizar_lista()
+    
+    def limpar_lista(self,):
+        resposta = messagebox.askyesno("Confirmar", "Deseja limpar a lista de tarefas?")
+        if resposta:
+            resposta2 = messagebox.askyesno("confirmar", "essa ação sera INREVERSIVEL, tem certeza absoluta???")
+            if resposta2:
+                self.lista_de_tarefas = []
+                self.salvar_tarefas()
+                self.atualizar_lista()
 
-atualizar_lista()
-
-root.mainloop()
+if __name__ == "__main__":
+    janela = tb.Window(themename="superhero")
+    app = ListaDeTarefasApp(janela)
+    janela.mainloop()
