@@ -207,7 +207,6 @@ class ListaDeTarefasApp:
                 self.atualizar_lista()
 
 # --- INICIALIZAÇÃO DA JANELA PRINCIPAL ---
-if __name__ == "__main__":
-    janela = tb.Window(themename="superhero")
-    app = ListaDeTarefasApp(janela)
-    janela.mainloop()
+janela = tb.Window(themename="superhero")
+app = ListaDeTarefasApp(janela)
+janela.mainloop()
