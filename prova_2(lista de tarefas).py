@@ -1,7 +1,7 @@
 # --- IMPORTS E CONFIGURAÇÕES INICIAIS ---
 import sys
 import subprocess
-
+# --- BLOCO 1: FUNÇÕES DE IMPORTAÇÃO DE LIB, ARQUIVO E DADOS (Pessoa 1) ---
 def instalar(pacote):
     try:
         __import__(pacote)
@@ -28,15 +28,15 @@ class ListaDeTarefasApp:
         # Configuração da janela principal
         self.master = master
         self.master.title("Lista de Tarefas")
-        self.master.geometry("520x500")
-        self.master.resizable(False, False)
+        self.master.geometry("560x540")
+        self.master.resizable(False, True)
 
         # Carrega tarefas do arquivo e inicializa interface
         self.lista_de_tarefas =self.carregar_tarefas()
         self._criar_widgets()
         self.atualizar_lista()
+# --------------------------------------
 
-    # --- BLOCO 1: FUNÇÕES DE ARQUIVO E DADOS (Pessoa 1) ---
     def carregar_tarefas(self):
         # Carrega tarefas do arquivo JSON, se existir
         if os.path.exists(ARQUIVO):
@@ -59,14 +59,15 @@ class ListaDeTarefasApp:
     # --- BLOCO 2: INTERFACE GRÁFICA (Pessoa 2) ---
     def _criar_widgets(self):
         # Cria os widgets principais da interface
-        tb.Label(self.master, text="Minhas Tarefas", font=("Arial", 18, "bold")).pack(pady=10)
+        tb.Label(self.master, text="Minhas Tarefas", font=("Segoe UI", 18, "bold")).pack(pady=10)
 
         entrada_frame = tb.Frame(self.master)
         entrada_frame.pack(pady=5)
         
-        # Campo para selecionar a data
+        # Campo para escolher a data
         self.campo_data = DateEntry(entrada_frame, width=12,  dateformat=r"%d/%m/%y")
         self.campo_data.pack(side="left", padx=(0, 10))
+        self.campo_data.entry.bind("<KeyRelease>", self.form_data)
 
         # Campo para digitar a tarefa
         self.campo_entrada = tb.Entry(entrada_frame, width=40)
@@ -78,8 +79,23 @@ class ListaDeTarefasApp:
         tb.Button(entrada_frame, text="Limpar", bootstyle="danger", command=self.limpar_lista).pack(side="left")
 
         # Frame onde as tarefas serão exibidas
-        self.container_tarefas = tb.Frame(self.master)
-        self.container_tarefas.pack(pady=10, fill="both", expand=True)
+        self.container_tarefas = tb.LabelFrame(self.master, borderwidth=2, relief="groove")
+        self.container_tarefas.pack(pady=15,padx=10, fill="both", expand=True)
+
+        
+    def form_data(self, event):
+        # Deixa oque foi inserido na caixa de data no formato dd/mm/yy automaticamente
+        valor = self.campo_data.entry.get().replace("/", "")
+        novo = ""
+        if len(valor) > 0:
+            novo += valor[:2]
+        if len(valor) > 2:
+            novo += "/" + valor[2:4]
+        if len(valor) > 4:
+            novo += "/" + valor[4:6]
+        self.campo_data.entry.delete(0, tb.END)
+        self.campo_data.entry.insert(0, novo)
+        self.campo_data.entry.icursor(tb.END)
 
     def atualizar_lista(self):
         # Atualiza a lista de tarefas na interface
@@ -105,11 +121,9 @@ class ListaDeTarefasApp:
         status = tb.Checkbutton(frame, variable=feito, command=checkin)
         status.pack(side="left")
         
-        # Destaca tarefa do dia
-        if data_tarefa == date.today():
-            tarefa_label = tb.Label(frame, text= item['tarefa'] , font=("Arial", 12, "bold"),anchor="w" )
-        else:
-            tarefa_label = tb.Label(frame, text=item['tarefa'], font=("Arial", 12), anchor="w")
+            
+        
+        tarefa_label = tb.Label(frame, text=item['tarefa'], font=("Arial", 12),wraplength=340, anchor="w")
         tarefa_label.pack(side="left", fill="x", expand=True)
         tarefa_label.bind("<Button-1>", lambda e, i=indice: self.toggle_feito(i))
 
@@ -118,17 +132,22 @@ class ListaDeTarefasApp:
         tb.Button(frame, text="🗑", width=2, bootstyle="danger", command=lambda i=indice: self.apagar_tarefa(i)).pack(side="right", padx=2)
 
         # Exibe a data da tarefa
-        tb.Label(frame, text=item["data"], font=("Arial", 10)).pack(side="right", padx=8)
+        if data_tarefa == date.today():
+            tb.Label(frame, text=item["data"], font=("Arial", 10), foreground="#f1e905").pack(side="right", padx=8)
+        elif data_tarefa <= date.today():
+            tb.Label(frame, text=item["data"], font=("Arial", 10), foreground="#e91010").pack(side="right", padx=8)
+        else:
+             tb.Label(frame, text=item["data"], font=("Arial", 10)).pack(side="right", padx=8)
 
     # --- BLOCO 3: FUNÇÕES DE INTERAÇÃO (Pessoa 3) ---
     def adicionar_tarefa(self):
         # Adiciona uma nova tarefa à lista
         texto = self.campo_entrada.get().strip()
         if texto:
-            try:
+            try: # Verifica se a data inserida é valída
                 data = datetime.strptime(self.campo_data.entry.get(), "%d/%m/%y").strftime("%d/%m/%y")
             except ValueError:
-                messagebox.showerror("Data invalída", "Por favor, insira uma data valída")
+                messagebox.showerror("Data invalída", "Por favor, insira uma data valída no formato: DD/MM/AA")
                 self.campo_data.entry.delete(0, tb.END)
                 self.campo_data.entry.insert(0, date.today().strftime("%d/%m/%y"))
                 self.campo_data.entry.focus()
