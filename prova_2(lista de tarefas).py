@@ -9,7 +9,8 @@ def instalar(pacote):
         subprocess.check_call([sys.executable, "-m", "pip", "install", pacote])
 
 instalar("ttkbootstrap")
-instalar("tkcalendar")
+instalar("json")
+instalar("tkinter")
 
 from datetime import date, datetime
 import json
@@ -106,7 +107,7 @@ class ListaDeTarefasApp:
         
         # Destaca tarefa do dia
         if data_tarefa == date.today():
-            tarefa_label = tb.Label(frame, text= item['tarefa'] , font=("Arial", 12, "bold"), borderwidth=2,anchor="w" )
+            tarefa_label = tb.Label(frame, text= item['tarefa'] , font=("Arial", 12, "bold"),anchor="w" )
         else:
             tarefa_label = tb.Label(frame, text=item['tarefa'], font=("Arial", 12), anchor="w")
         tarefa_label.pack(side="left", fill="x", expand=True)
@@ -127,8 +128,11 @@ class ListaDeTarefasApp:
             try:
                 data = datetime.strptime(self.campo_data.entry.get(), "%d/%m/%y").strftime("%d/%m/%y")
             except ValueError:
-                messagebox.showerror("Data invalída", "Porfavor, insira uma data valída")
-                data= ""
+                messagebox.showerror("Data invalída", "Por favor, insira uma data valída")
+                self.campo_data.entry.delete(0, tb.END)
+                self.campo_data.entry.insert(0, date.today().strftime("%d/%m/%y"))
+                self.campo_data.entry.focus()
+                return
             self.lista_de_tarefas.append({"tarefa": texto, "feito": False, "data": str(data)})
             self.salvar_tarefas()
             self.atualizar_lista()
