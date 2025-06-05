@@ -35,7 +35,7 @@ from ttkbootstrap import DateEntry  # Campo especial para escolher datas
 ARQUIVO = "tarefas.json"  # Nome do arquivo onde as tarefas serão salvas
 ```
 - **O que faz:** Garante que todas as bibliotecas necessárias estejam instaladas e importadas.  
-- **Por que:** Assim, o programa funciona em qualquer computador, mesmo que nunca tenha ins.
+- **Por que:** Assim, o programa funciona em qualquer computador, mesmo que nunca tenha rodado python antes.
 
 ---
 
