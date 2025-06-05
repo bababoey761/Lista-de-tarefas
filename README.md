@@ -1,84 +1,317 @@
+# Lista de Tarefas Python - Explicação do Código
 
-# Lista de Tarefas - Aplicação com Interface Gráfica em Python 📝
-
-Este projeto é uma aplicação de **lista de tarefas com interface gráfica** desenvolvida em Python utilizando a biblioteca `ttkbootstrap`. Ele permite adicionar, editar, marcar como concluída e remover tarefas com datas associadas, salvando os dados em um arquivo `.json` local.
-
-## 🎯 Objetivo
-
-Desenvolver uma aplicação de Lista de Tarefas com interface amigável e moderna que possibilite ao usuário organizar suas atividades do dia a dia.
-
-## 👥 Divisão de Tarefas
-
-O projeto foi dividido entre **3 integrantes**, conforme os blocos abaixo:
-
-### 👤 Pessoa 1 - Instalação e Dados
-- Instalação automática de bibliotecas necessárias (`ttkbootstrap`, `tkinter`, `json`).
-- Carregamento e salvamento de tarefas em JSON.
-- Organização do arquivo `tarefas.json` para persistência de dados.
-
-### 👤 Pessoa 2 - Interface Gráfica
-- Construção da interface com `ttkbootstrap`.
-- Campos de entrada de data e tarefa.
-- Área de exibição de tarefas com destaque por data.
-- Botões de ação: adicionar, limpar, editar e apagar tarefas.
-
-### 👤 Pessoa 3 - Lógica e Funcionalidade
-- Adicionar, editar, remover e marcar tarefas como feitas.
-- Validação de data.
-- Atualização da interface após ações.
-- Confirmações para ações destrutivas (como limpar a lista).
-
-## 📦 Tecnologias e Bibliotecas
-
-- Python 3.x
-- ttkbootstrap (UI moderna baseada em tkinter)
-- json, datetime, os, sys, subprocess
-
-## 💻 Como Executar
-
-1. Certifique-se de ter Python instalado.
-2. Execute o script Python:
-
-```bash
-python "prova_2(lista de tarefas).py"
-```
-
-3. A janela da lista de tarefas será exibida.
-
-## 💾 Armazenamento de Dados
-
-As tarefas são armazenadas no arquivo `tarefas.json`, com o seguinte formato:
-
-```json
-[
-  {
-    "tarefa": "Estudar para a prova",
-    "feito": false,
-    "data": "05/06/25"
-  }
-]
-```
-
-## 🔧 Funcionalidades
-
-- ✅ Marcar tarefa como concluída
-- 📝 Editar texto da tarefa
-- 🗑 Remover tarefa
-- 📅 Associar data à tarefa (com validação)
-- ⚠️ Limpeza de todas as tarefas com confirmação dupla
-
-## 📌 Observações
-
-- A data deve estar no formato **DD/MM/AA**.
-- A interface responde dinamicamente às ações do usuário.
-- A aplicação salva os dados localmente para uso contínuo.
-
-## 🚀 Melhorias Futuras
-
-- Ordenação por data ou prioridade
-- Filtro por tarefas concluídas ou pendentes
-- Backup/exportação de tarefas
+Este documento explica, passo a passo, o funcionamento do código da nossa Lista de Tarefas feita em Python com interface gráfica usando `ttkbootstrap` e `tkinter`.
 
 ---
 
-Projeto desenvolvido colaborativamente por 3 participantes para fins educacionais e demonstrativos.
+## 1. Imports e Instalação de Bibliotecas
+
+```python
+import sys  # Permite acessar funções do sistema operacional
+import subprocess  # Permite rodar comandos do sistema, como instalar pacotes
+
+def instalar(pacote):
+    """
+    Tenta importar o pacote. Se não conseguir, instala automaticamente usando pip.
+    """
+    try:
+        __import__(pacote)  # Tenta importar o pacote pelo nome
+    except ImportError:
+        subprocess.check_call([sys.executable, "-m", "pip", "install", pacote])  # Instala o pacote
+
+# Instala as bibliotecas necessárias, se não estiverem presentes
+instalar("ttkbootstrap")
+instalar("json")
+instalar("tkinter")
+
+from datetime import date, datetime  # Para trabalhar com datas
+import json  # Para salvar e ler tarefas em arquivo
+import os  # Para acessar funções do sistema, como verificar se um arquivo existe
+from tkinter import Toplevel, Entry, Button, messagebox  # Widgets básicos do Tkinter
+import ttkbootstrap as tb  # Biblioteca para deixar a interface mais bonita
+from ttkbootstrap.constants import *  # Constantes de estilos do ttkbootstrap
+from ttkbootstrap import DateEntry  # Campo especial para escolher datas
+
+ARQUIVO = "tarefas.json"  # Nome do arquivo onde as tarefas serão salvas
+```
+- **Resumo:** Garante que todas as bibliotecas necessárias estejam instaladas e importadas.  
+- **Destaque:** O programa instala automaticamente o que faltar, facilitando para quem nunca rodou Python antes.
+
+---
+
+## 2. Classe Principal da Aplicação
+
+```python
+class ListaDeTarefasApp:
+    def __init__(self, master):
+        # Configuração da janela principal
+        self.master = master  # Guarda a janela principal
+        self.master.title("Lista de Tarefas")  # Define o título da janela
+        self.master.geometry("560x540")  # Define o tamanho da janela
+        self.master.resizable(False, True)  # Permite redimensionar só na vertical
+
+        # Carrega tarefas do arquivo e inicializa interface
+        self.lista_de_tarefas = self.carregar_tarefas()  # Carrega tarefas já salvas
+        self._criar_widgets()  # Cria os botões, campos e caixas da interface
+        self.atualizar_lista()  # Mostra as tarefas na tela
+```
+- **Resumo:** Cria a janela principal, carrega as tarefas já salvas e monta a interface.
+
+---
+
+## 3. Carregar e Salvar Tarefas
+
+```python
+def carregar_tarefas(self):
+    """
+    Carrega tarefas do arquivo JSON, se existir.
+    """
+    if os.path.exists(ARQUIVO):  # Verifica se o arquivo existe
+        try:
+            with open(ARQUIVO, "r", encoding="utf-8") as f:  # Abre o arquivo para leitura
+                return json.load(f)  # Lê as tarefas do arquivo
+        except:
+            messagebox.showwarning("Aviso", "Erro ao carregar tarefas.")  # Mostra aviso se der erro
+            return []
+    return []  # Se não existir, retorna lista vazia
+
+def salvar_tarefas(self):
+    """
+    Salva as tarefas no arquivo JSON.
+    """
+    try:
+        with open(ARQUIVO, "w", encoding="utf-8") as f:  # Abre o arquivo para escrita
+            json.dump(self.lista_de_tarefas, f, ensure_ascii=False, indent=2)  # Salva as tarefas
+    except:
+        messagebox.showerror("Erro", "Erro ao salvar tarefas.")  # Mostra erro se não conseguir salvar
+```
+- **Resumo:** Lê e salva as tarefas em um arquivo para não perder nada quando fechar o programa.
+
+---
+
+## 4. Interface Gráfica
+
+```python
+def _criar_widgets(self):
+    # Cria os widgets principais da interface
+
+    # Título da lista
+    tb.Label(self.master, text="Minhas Tarefas", font=("Segoe UI", 18, "bold")).pack(pady=10)
+
+    # Frame para os campos de entrada (data e tarefa)
+    entrada_frame = tb.Frame(self.master)
+    entrada_frame.pack(pady=5)
+    
+    # Campo para escolher a data (DateEntry é um calendário)
+    self.campo_data = DateEntry(entrada_frame, width=12,  dateformat=r"%d/%m/%y")
+    self.campo_data.pack(side="left", padx=(0, 10))
+    # Quando digitar, formata a data automaticamente
+    self.campo_data.entry.bind("<KeyRelease>", self.form_data)
+
+    # Campo para digitar a tarefa
+    self.campo_entrada = tb.Entry(entrada_frame, width=40)
+    self.campo_entrada.pack(side="left", padx=(0, 10))
+    self.campo_entrada.focus()  # Deixa o cursor pronto para digitar
+    # Se apertar Enter, adiciona a tarefa
+    self.campo_entrada.bind('<Return>', lambda event: self.adicionar_tarefa())
+
+    # Botão para limpar a lista de tarefas
+    tb.Button(entrada_frame, text="Limpar", bootstyle="danger", command=self.limpar_lista).pack(side="left")
+
+    # Caixa onde as tarefas vão aparecer
+    self.container_tarefas = tb.LabelFrame(self.master, borderwidth=2, relief="groove")
+    self.container_tarefas.pack(pady=15, padx=10, fill="both", expand=True)
+```
+- **Resumo:** Monta a tela com campos para digitar tarefas, escolher datas e botões para interagir.
+
+---
+
+## 5. Formatação Automática da Data
+
+```python
+def form_data(self, event):
+    """
+    Formata o que foi digitado na caixa de data para o formato dd/mm/yy automaticamente.
+    """
+    valor = self.campo_data.entry.get().replace("/", "")  # Remove as barras
+    novo = ""
+    if len(valor) > 0:
+        novo += valor[:2]  # Dia
+    if len(valor) > 2:
+        novo += "/" + valor[2:4]  # Mês
+    if len(valor) > 4:
+        novo += "/" + valor[4:6]  # Ano
+    self.campo_data.entry.delete(0, tb.END)  # Limpa o campo
+    self.campo_data.entry.insert(0, novo)  # Insere o texto formatado
+    self.campo_data.entry.icursor(tb.END)  # Coloca o cursor no final
+```
+- **Resumo:** Ajuda o usuário a digitar a data no formato correto, colocando as barras automaticamente.
+
+---
+
+## 6. Atualizar a Lista de Tarefas
+
+```python
+def atualizar_lista(self):
+    """
+    Atualiza a lista de tarefas na interface.
+    """
+    for widget in self.container_tarefas.winfo_children():
+        widget.destroy()  # Remove tudo que está na tela
+    for indice, item in enumerate(self.lista_de_tarefas):
+        self._adicionar_linha(item, indice)  # Adiciona cada tarefa de novo
+```
+- **Resumo:** Limpa e mostra todas as tarefas na tela, sempre atualizadas.
+
+---
+
+## 7. Adicionar Linha de Tarefa
+
+```python
+def _adicionar_linha(self, item, indice):
+    """
+    Adiciona uma linha (tarefa) na interface.
+    """
+    frame = tb.Frame(self.container_tarefas)
+    frame.pack(fill="x", pady=2, padx=10)
+
+    data_tarefa = datetime.strptime(item["data"], "%d/%m/%y").date()  # Converte a data de texto para data
+
+    def checkin():
+        # Marca/desmarca tarefa como feita
+        self.lista_de_tarefas[indice]["feito"] = feito.get()
+        self.salvar_tarefas()
+        self.atualizar_lista()
+
+    feito = tb.BooleanVar(value=item["feito"])  # Variável booleana para o checkbox
+    status = tb.Checkbutton(frame, variable=feito, command=checkin)  # Checkbox para marcar como feita
+    status.pack(side="left")
+    
+    # Label da tarefa, quebra linha se for muito grande
+    tarefa_label = tb.Label(frame, text=item['tarefa'], font=("Arial", 12), wraplength=340, anchor="w")
+    tarefa_label.pack(side="left", fill="x", expand=True)
+    # Se clicar no texto, alterna entre feito/não feito
+    tarefa_label.bind("<Button-1>", lambda e, i=indice: self.toggle_feito(i))
+
+    # Botões de editar e apagar
+    tb.Button(frame, text="✏", width=2, bootstyle="secondary", command=lambda i=indice: self.editar_tarefa(i)).pack(side="right", padx=2)
+    tb.Button(frame, text="🗑", width=2, bootstyle="danger", command=lambda i=indice: self.apagar_tarefa(i)).pack(side="right", padx=2)
+
+    # Exibe a data da tarefa, com cor diferente se for hoje ou atrasada
+    if data_tarefa == date.today():
+        tb.Label(frame, text=item["data"], font=("Arial", 10), foreground="#f1e905").pack(side="right", padx=8)
+    elif data_tarefa <= date.today():
+        tb.Label(frame, text=item["data"], font=("Arial", 10), foreground="#e91010").pack(side="right", padx=8)
+    else:
+        tb.Label(frame, text=item["data"], font=("Arial", 10)).pack(side="right", padx=8)
+```
+- **Resumo:** Mostra cada tarefa na tela, com botões para marcar como feita, editar ou apagar, e destaca a data.
+
+---
+
+## 8. Funções de Interação
+
+```python
+def adicionar_tarefa(self):
+    """
+    Adiciona uma nova tarefa à lista.
+    """
+    texto = self.campo_entrada.get().strip()  # Pega o texto digitado, sem espaços extras
+    if texto:
+        try:  # Verifica se a data inserida é válida
+            data = datetime.strptime(self.campo_data.entry.get(), "%d/%m/%y").strftime("%d/%m/%y")
+        except ValueError:
+            messagebox.showerror("Data invalída", "Por favor, insira uma data valída no formato: DD/MM/AA")
+            self.campo_data.entry.delete(0, tb.END)
+            self.campo_data.entry.insert(0, date.today().strftime("%d/%m/%y"))
+            self.campo_data.entry.focus()
+            return
+        # Adiciona a tarefa na lista
+        self.lista_de_tarefas.append({"tarefa": texto, "feito": False, "data": str(data)})
+        self.salvar_tarefas()
+        self.atualizar_lista()
+        self.campo_entrada.delete(0, tb.END)  # Limpa o campo de texto
+    else:
+        messagebox.showinfo("Atenção", "Digite algo para adicionar.")
+
+def toggle_feito(self, indice):
+    """
+    Alterna o status de feito/não feito.
+    """
+    self.lista_de_tarefas[indice]["feito"] = not self.lista_de_tarefas[indice]["feito"]
+    self.salvar_tarefas()
+    self.atualizar_lista()
+
+def editar_tarefa(self, indice):
+    """
+    Abre janela para editar o texto da tarefa.
+    """
+    texto_atual = self.lista_de_tarefas[indice]["tarefa"]
+
+    janela_editar = Toplevel(self.master)  # Cria uma nova janela
+    janela_editar.title("Editar Tarefa")
+    janela_editar.geometry("340x130")
+    janela_editar.resizable(False, False)
+
+    entrada_editar = Entry(janela_editar, width=40)  # Campo para editar o texto
+    entrada_editar.insert(0, texto_atual)
+    entrada_editar.pack(pady=20)
+    entrada_editar.focus()
+
+    def salvar():
+        novo_texto = entrada_editar.get().strip()
+        if novo_texto:
+            self.lista_de_tarefas[indice]["tarefa"] = novo_texto
+            self.salvar_tarefas()
+            self.atualizar_lista()
+            janela_editar.destroy()  # Fecha a janela de edição
+        else:
+            messagebox.showwarning("Aviso", "Texto não pode ficar vazio.")
+
+    Button(janela_editar, text="Salvar", command=salvar).pack()
+
+def apagar_tarefa(self, indice):
+    """
+    Remove uma tarefa da lista, após confirmação.
+    """
+    if messagebox.askyesno("Confirmar", "Deseja apagar esta tarefa?"):
+        self.lista_de_tarefas.pop(indice)
+        self.salvar_tarefas()
+        self.atualizar_lista()
+
+def limpar_lista(self):
+    """
+    Limpa todas as tarefas da lista (com confirmação dupla).
+    """
+    if messagebox.askyesno("Confirmar", "Deseja limpar a lista de tarefas?"):
+        if messagebox.askyesno("Confirmar", "Essa ação é IRREVERSÍVEL. Tem certeza?"):
+            self.lista_de_tarefas.clear()
+            self.salvar_tarefas()
+            self.atualizar_lista()
+```
+- **Resumo:** Permite adicionar, marcar como feita, editar, apagar e limpar tarefas.
+
+---
+
+## 9. Inicialização da Janela Principal
+
+```python
+# --- INICIALIZAÇÃO DA JANELA PRINCIPAL ---
+# Cria a janela principal com o tema "superhero"
+janela = tb.Window(themename="superhero")
+app = ListaDeTarefasApp(janela)  # Cria o aplicativo
+janela.mainloop()  # Mantém a janela aberta esperando ações do usuário
+```
+- **Resumo:** Cria a janela principal, inicia o aplicativo e mantém a janela aberta até o usuário fechar.
+
+---
+
+## Dicas Finais
+
+- **Cada função tem um comentário explicando o que faz.**
+- **Se tiver dúvida sobre algum comando, procure o comentário acima dele!**
+- **O código está dividido em blocos para facilitar a apresentação em grupo.**
+
+---
+
+Se quiserem mais detalhes sobre algum trecho, só pedir!
