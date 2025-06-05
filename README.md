@@ -34,8 +34,8 @@ from ttkbootstrap import DateEntry  # Campo especial para escolher datas
 
 ARQUIVO = "tarefas.json"  # Nome do arquivo onde as tarefas serão salvas
 ```
-- **Resumo:** Garante que todas as bibliotecas necessárias estejam instaladas e importadas.  
-- **Destaque:** O programa instala automaticamente o que faltar, facilitando para quem nunca rodou Python antes.
+- **O que faz:** Garante que todas as bibliotecas necessárias estejam instaladas e importadas.  
+- **Por que:** Assim, o programa funciona em qualquer computador, mesmo que nunca tenha ins.
 
 ---
 
@@ -55,7 +55,7 @@ class ListaDeTarefasApp:
         self._criar_widgets()  # Cria os botões, campos e caixas da interface
         self.atualizar_lista()  # Mostra as tarefas na tela
 ```
-- **Resumo:** Cria a janela principal, carrega as tarefas já salvas e monta a interface.
+- **O que faz:** Cria a janela principal, carrega as tarefas já salvas e monta a interface.
 
 ---
 
@@ -85,7 +85,7 @@ def salvar_tarefas(self):
     except:
         messagebox.showerror("Erro", "Erro ao salvar tarefas.")  # Mostra erro se não conseguir salvar
 ```
-- **Resumo:** Lê e salva as tarefas em um arquivo para não perder nada quando fechar o programa.
+- **O que faz:** Lê e salva as tarefas em um arquivo para não perder nada quando fechar o programa.
 
 ---
 
@@ -122,7 +122,7 @@ def _criar_widgets(self):
     self.container_tarefas = tb.LabelFrame(self.master, borderwidth=2, relief="groove")
     self.container_tarefas.pack(pady=15, padx=10, fill="both", expand=True)
 ```
-- **Resumo:** Monta a tela com campos para digitar tarefas, escolher datas e botões para interagir.
+- **O que faz:** Monta a tela com campos para digitar tarefas, escolher datas e botões para interagir.
 
 ---
 
@@ -145,7 +145,7 @@ def form_data(self, event):
     self.campo_data.entry.insert(0, novo)  # Insere o texto formatado
     self.campo_data.entry.icursor(tb.END)  # Coloca o cursor no final
 ```
-- **Resumo:** Ajuda o usuário a digitar a data no formato correto, colocando as barras automaticamente.
+- **O que faz:** Ajuda o usuário a digitar a data no formato correto, colocando as barras automaticamente.
 
 ---
 
@@ -161,7 +161,7 @@ def atualizar_lista(self):
     for indice, item in enumerate(self.lista_de_tarefas):
         self._adicionar_linha(item, indice)  # Adiciona cada tarefa de novo
 ```
-- **Resumo:** Limpa e mostra todas as tarefas na tela, sempre atualizadas.
+- **O que faz:** Limpa e mostra todas as tarefas na tela, sempre atualizadas.
 
 ---
 
@@ -205,7 +205,7 @@ def _adicionar_linha(self, item, indice):
     else:
         tb.Label(frame, text=item["data"], font=("Arial", 10)).pack(side="right", padx=8)
 ```
-- **Resumo:** Mostra cada tarefa na tela, com botões para marcar como feita, editar ou apagar, e destaca a data.
+- **O que faz:** Mostra cada tarefa na tela, com botões para marcar como feita, editar ou apagar, e destaca a data.
 
 ---
 
@@ -289,7 +289,7 @@ def limpar_lista(self):
             self.salvar_tarefas()
             self.atualizar_lista()
 ```
-- **Resumo:** Permite adicionar, marcar como feita, editar, apagar e limpar tarefas.
+- **O que faz:** Permite adicionar, marcar como feita, editar, apagar e limpar tarefas.
 
 ---
 
@@ -302,15 +302,21 @@ janela = tb.Window(themename="superhero")
 app = ListaDeTarefasApp(janela)  # Cria o aplicativo
 janela.mainloop()  # Mantém a janela aberta esperando ações do usuário
 ```
-- **Resumo:** Cria a janela principal, inicia o aplicativo e mantém a janela aberta até o usuário fechar.
+- **O que faz:** Cria a janela principal, inicia o aplicativo e mantém a janela aberta até o usuário fechar.
 
 ---
 
-## Dicas Finais
+## **Resumo**
 
+- O código cria uma lista de tarefas com interface gráfica.
+- Permite adicionar, marcar como feita, editar, apagar e limpar tarefas.
+- Salva tudo em um arquivo para não perder as tarefas.
+- Usa bibliotecas para deixar a interface mais bonita e fácil de usar.
+
+---
+
+## Dica:
 - **Cada função tem um comentário explicando o que faz.**
-- **Se tiver dúvida sobre algum comando, procure o comentário acima dele!**
-- **O código está dividido em blocos para facilitar a apresentação em grupo.**
 
 ---
 
