@@ -99,6 +99,7 @@ class ListaDeTarefasApp:
 
     def atualizar_lista(self):
         # Atualiza a lista de tarefas na interface
+        elf.lista_de_tarefas.sort(key=lambda item: datetime.strptime(item["data"], "%d/%m/%y"), reverse=True) # Ordena as tarefas por data
         for widget in self.container_tarefas.winfo_children():
             widget.destroy()
         for indice, item in enumerate(self.lista_de_tarefas):
