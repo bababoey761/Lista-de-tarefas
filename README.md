@@ -156,6 +156,7 @@ def atualizar_lista(self):
     """
     Atualiza a lista de tarefas na interface.
     """
+    self.lista_de_tarefas.sort(key=lambda item: datetime.strptime(item["data"], "%d/%m/%y"), reverse=True) # Ordena as tarefas por data
     for widget in self.container_tarefas.winfo_children():
         widget.destroy()  # Remove tudo que está na tela
     for indice, item in enumerate(self.lista_de_tarefas):
