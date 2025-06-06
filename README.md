@@ -133,17 +133,17 @@ def form_data(self, event):
     """
     Formata o que foi digitado na caixa de data para o formato dd/mm/yy automaticamente.
     """
-    valor = self.campo_data.entry.get().replace("/", "")  # Remove as barras
+    valor = self.campo_data.entry.get().replace("/", "")  # Remove todas as barras do que foi digitado (ex: '120624')
     novo = ""
     if len(valor) > 0:
-        novo += valor[:2]  # Dia
+        novo += valor[:2]  # Pega os dois primeiros dígitos (dia)
     if len(valor) > 2:
-        novo += "/" + valor[2:4]  # Mês
+        novo += "/" + valor[2:4]  # Depois dos dois primeiros, pega os próximos dois (mês) e adiciona uma barra antes
     if len(valor) > 4:
-        novo += "/" + valor[4:6]  # Ano
-    self.campo_data.entry.delete(0, tb.END)  # Limpa o campo
-    self.campo_data.entry.insert(0, novo)  # Insere o texto formatado
-    self.campo_data.entry.icursor(tb.END)  # Coloca o cursor no final
+        novo += "/" + valor[4:6]  # Depois do mês, pega os próximos dois (ano) e adiciona outra barra antes
+    self.campo_data.entry.delete(0, tb.END)  # Limpa o campo de data para inserir o texto formatado
+    self.campo_data.entry.insert(0, novo)  # Insere o texto já formatado
+    self.campo_data.entry.icursor(tb.END)  # Coloca o cursor no final do texto, para facilitar a digitação
 ```
 - **O que faz:** Ajuda o usuário a digitar a data no formato correto, colocando as barras automaticamente.
 
@@ -314,11 +314,3 @@ janela.mainloop()  # Mantém a janela aberta esperando ações do usuário
 - Salva tudo em um arquivo para não perder as tarefas.
 - Usa bibliotecas para deixar a interface mais bonita e fácil de usar.
 
----
-
-## Dica:
-- **Cada função tem um comentário explicando o que faz.**
-
----
-
-Se quiserem mais detalhes sobre algum trecho, só pedir!
