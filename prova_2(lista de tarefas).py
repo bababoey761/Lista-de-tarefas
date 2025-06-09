@@ -119,7 +119,10 @@ class ListaDeTarefasApp:
             self.atualizar_lista()
 
         feito = tb.BooleanVar(value=item["feito"])
-        status = tb.Checkbutton(frame, variable=feito, command=checkin)
+        if data_tarefa < date.today():
+             status = tb.Checkbutton(frame, variable=feito, command=checkin, state="disabled")
+        else:
+            status = tb.Checkbutton(frame, variable=feito, command=checkin)
         status.pack(side="left")
         
             
@@ -132,13 +135,16 @@ class ListaDeTarefasApp:
         tb.Button(frame, text="✏", width=2, bootstyle="secondary", command=lambda i=indice: self.editar_tarefa(i)).pack(side="right", padx=2)
         tb.Button(frame, text="🗑", width=2, bootstyle="danger", command=lambda i=indice: self.apagar_tarefa(i)).pack(side="right", padx=2)
 
-        # Exibe a data da tarefa
-        if data_tarefa == date.today():
-            tb.Label(frame, text=item["data"], font=("Arial", 10), foreground="#f1e905").pack(side="right", padx=8)
-        elif data_tarefa <= date.today():
-            tb.Label(frame, text=item["data"], font=("Arial", 10), foreground="#e91010").pack(side="right", padx=8)
+        if item['feito']:
+            tb.Label(frame, text=item["data"], font=("Arial", 10), foreground="#00f91d").pack(side="right", padx=8)
         else:
-             tb.Label(frame, text=item["data"], font=("Arial", 10)).pack(side="right", padx=8)
+            # Exibe a data da tarefa
+            if data_tarefa == date.today():
+                tb.Label(frame, text=item["data"], font=("Arial", 10), foreground="#f1e905").pack(side="right", padx=8)
+            elif data_tarefa <= date.today():
+                tb.Label(frame, text=item["data"], font=("Arial", 10), foreground="#e91010").pack(side="right", padx=8)
+            else:
+                tb.Label(frame, text=item["data"], font=("Arial", 10)).pack(side="right", padx=8)
 
     # --- BLOCO 3: FUNÇÕES DE INTERAÇÃO (Luis Davi) ---
     def adicionar_tarefa(self):
