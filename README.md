@@ -4,7 +4,7 @@ Este documento explica, passo a passo, o funcionamento do código da nossa Lista
 
 ---
 
-## 1. Imports e Instalação de Bibliotecas
+## 1. Imports e Instalação de Bibliotecas (Heitor)
 
 ```python
 import sys  # Permite acessar funções do sistema operacional
@@ -39,7 +39,7 @@ ARQUIVO = "tarefas.json"  # Nome do arquivo onde as tarefas serão salvas
 
 ---
 
-## 2. Classe Principal da Aplicação
+## 2. Classe Principal da Aplicação (Heitor)
 
 ```python
 class ListaDeTarefasApp:
@@ -59,7 +59,7 @@ class ListaDeTarefasApp:
 
 ---
 
-## 3. Carregar e Salvar Tarefas
+## 3. Carregar e Salvar Tarefas (Heitor)
 
 ```python
 def carregar_tarefas(self):
@@ -89,7 +89,7 @@ def salvar_tarefas(self):
 
 ---
 
-## 4. Interface Gráfica
+## 4. Interface Gráfica (Bernardo Franco)
 
 ```python
 def _criar_widgets(self):
@@ -126,7 +126,7 @@ def _criar_widgets(self):
 
 ---
 
-## 5. Formatação Automática da Data
+## 5. Formatação Automática da Data (Bernardo Franco)
 
 ```python
 def form_data(self, event):
@@ -149,7 +149,7 @@ def form_data(self, event):
 
 ---
 
-## 6. Atualizar a Lista de Tarefas
+## 6. Atualizar a Lista de Tarefas (Bernardo Franco)
 
 ```python
 def atualizar_lista(self):
@@ -166,7 +166,7 @@ def atualizar_lista(self):
 
 ---
 
-## 7. Adicionar Linha de Tarefa
+## 7. Adicionar Linha de Tarefa (Bernardo Franco)
 
 ```python
 def _adicionar_linha(self, item, indice):
@@ -217,7 +217,7 @@ def _adicionar_linha(self, item, indice):
 
 ---
 
-## 8. Funções de Interação
+## 8. Funções de Interação (Luis Davi)
 
 ```python
 def adicionar_tarefa(self):
@@ -301,7 +301,7 @@ def limpar_lista(self):
 
 ---
 
-## 9. Inicialização da Janela Principal
+## 9. Inicialização da Janela Principal (Luis Davi)
 
 ```python
 # --- INICIALIZAÇÃO DA JANELA PRINCIPAL ---
