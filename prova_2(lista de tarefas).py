@@ -1,7 +1,7 @@
 # --- IMPORTS E CONFIGURAÇÕES INICIAIS ---
 import sys
 import subprocess
-# --- BLOCO 1: FUNÇÕES DE IMPORTAÇÃO DE LIB, ARQUIVO E DADOS (Pessoa 1) ---
+# --- BLOCO 1: FUNÇÕES DE IMPORTAÇÃO DE LIB, ARQUIVO E DADOS (Heitor) ---
 def instalar(pacote):
     try:
         __import__(pacote)
@@ -56,7 +56,7 @@ class ListaDeTarefasApp:
         except:
             messagebox.showerror("Erro", "Erro ao salvar tarefas.")
 
-    # --- BLOCO 2: INTERFACE GRÁFICA (Pessoa 2) ---
+    # --- BLOCO 2: INTERFACE GRÁFICA (Bernardo Franco) ---
     def _criar_widgets(self):
         # Cria os widgets principais da interface
         tb.Label(self.master, text="Minhas Tarefas", font=("Segoe UI", 18, "bold")).pack(pady=10)
@@ -99,7 +99,7 @@ class ListaDeTarefasApp:
 
     def atualizar_lista(self):
         # Atualiza a lista de tarefas na interface
-        elf.lista_de_tarefas.sort(key=lambda item: datetime.strptime(item["data"], "%d/%m/%y"), reverse=True) # Ordena as tarefas por data
+        self.lista_de_tarefas.sort(key=lambda item: datetime.strptime(item["data"], "%d/%m/%y"), reverse=True) # Ordena as tarefas por data
         for widget in self.container_tarefas.winfo_children():
             widget.destroy()
         for indice, item in enumerate(self.lista_de_tarefas):
@@ -140,7 +140,7 @@ class ListaDeTarefasApp:
         else:
              tb.Label(frame, text=item["data"], font=("Arial", 10)).pack(side="right", padx=8)
 
-    # --- BLOCO 3: FUNÇÕES DE INTERAÇÃO (Pessoa 3) ---
+    # --- BLOCO 3: FUNÇÕES DE INTERAÇÃO (Luis Davi) ---
     def adicionar_tarefa(self):
         # Adiciona uma nova tarefa à lista
         texto = self.campo_entrada.get().strip()
