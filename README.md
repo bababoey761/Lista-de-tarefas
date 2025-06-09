@@ -185,7 +185,10 @@ def _adicionar_linha(self, item, indice):
         self.atualizar_lista()
 
     feito = tb.BooleanVar(value=item["feito"])  # Variável booleana para o checkbox
-    status = tb.Checkbutton(frame, variable=feito, command=checkin)  # Checkbox para marcar como feita
+    if data_tarefa < date.today():
+        status = tb.Checkbutton(frame, variable=feito, command=checkin, state="disabled") # Caso tenha passado a data, a checkbox é desativada
+    else:
+        status = tb.Checkbutton(frame, variable=feito, command=checkin) # Checkbox para marcar como feita
     status.pack(side="left")
     
     # Label da tarefa, quebra linha se for muito grande
@@ -199,12 +202,16 @@ def _adicionar_linha(self, item, indice):
     tb.Button(frame, text="🗑", width=2, bootstyle="danger", command=lambda i=indice: self.apagar_tarefa(i)).pack(side="right", padx=2)
 
     # Exibe a data da tarefa, com cor diferente se for hoje ou atrasada
-    if data_tarefa == date.today():
-        tb.Label(frame, text=item["data"], font=("Arial", 10), foreground="#f1e905").pack(side="right", padx=8)
-    elif data_tarefa <= date.today():
-        tb.Label(frame, text=item["data"], font=("Arial", 10), foreground="#e91010").pack(side="right", padx=8)
+    if item['feito']: # Deixa a data verde se ja foi feita
+        tb.Label(frame, text=item["data"], font=("Arial", 10), foreground="#00f91d").pack(side="right", padx=8)
     else:
-        tb.Label(frame, text=item["data"], font=("Arial", 10)).pack(side="right", padx=8)
+        # Exibe a data da tarefa
+        if data_tarefa == date.today(): # Verifica se a data da tarefa corresponde a data atual
+            tb.Label(frame, text=item["data"], font=("Arial", 10), foreground="#f1e905").pack(side="right", padx=8)
+        elif data_tarefa < date.today(): # Verifica se ja passou a data da tarefa
+            tb.Label(frame, text=item["data"], font=("Arial", 10), foreground="#e91010").pack(side="right", padx=8)
+        else:
+            tb.Label(frame, text=item["data"], font=("Arial", 10)).pack(side="right", padx=8)
 ```
 - **O que faz:** Mostra cada tarefa na tela, com botões para marcar como feita, editar ou apagar, e destaca a data.
 
@@ -313,4 +320,3 @@ janela.mainloop()  # Mantém a janela aberta esperando ações do usuário
 - Permite adicionar, marcar como feita, editar, apagar e limpar tarefas.
 - Salva tudo em um arquivo para não perder as tarefas.
 - Usa bibliotecas para deixar a interface mais bonita e fácil de usar.
-
