@@ -186,7 +186,7 @@ def _adicionar_linha(self, item, indice):
 
     feito = tb.BooleanVar(value=item["feito"])  # Variável booleana para o checkbox
     if data_tarefa < date.today():
-        status = tb.Checkbutton(frame, variable=feito, command=checkin, state="disabled") # Caso tenha passado a data, /p a checkbox é desativada
+        status = tb.Checkbutton(frame, variable=feito, command=checkin, state="disabled") # Caso tenha passado a data, a checkbox é desativada
     else:
         status = tb.Checkbutton(frame, variable=feito, command=checkin) # Checkbox para marcar como feita
     status.pack(side="left")
