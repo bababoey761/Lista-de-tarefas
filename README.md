@@ -267,7 +267,7 @@ def editar_tarefa(self, indice):
     entrada_editar.focus()
 
     def salvar():
-        novo_texto = entrada_editar.get().strip()
+        novo_texto = entrada_editar.get().strip() # Pega o texto da tarefa e coloca na caixa de entrada
         if novo_texto:
             self.lista_de_tarefas[indice]["tarefa"] = novo_texto
             self.salvar_tarefas()
